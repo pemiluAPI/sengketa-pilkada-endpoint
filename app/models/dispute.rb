@@ -23,8 +23,8 @@ class Dispute < ActiveRecord::Base
   def construct
     return {
       id: id,
-      region: (region.construct if region),
-      category: (category.construct if category),
+      region: handle(region),
+      category: handle(category),
       applicant: applicant,
       respondent: respondent,
       disputed: disputed,
@@ -36,4 +36,9 @@ protected
   def self.setlimit(limit)
     limit = (limit.to_i == 0 || limit.empty?) ? 1000 : limit
   end
+
+  def handle(obj)
+    obj.present? ? obj.construct : {}
+  end
+
 end
