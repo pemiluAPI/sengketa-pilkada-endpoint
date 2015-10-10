@@ -4,20 +4,24 @@ class Category < ActiveRecord::Base
   validates :name,
    					presence: true
 
+  scope :by_id, lambda{ |id| where("id = ?", id) unless id.nil? }
+
   def self.apiall(data = {})
-    categories          = self.all
+    categories          = self.by_id(data[:id])
     paginate_categories = categories.limit(setlimit(data[:limit])).offset(data[:offset])
 
     return {
-      categories: paginate_categories.map{|category|
-                  {
-                  	id: category.id,
-                  	name: category.name
-                  }
-              	},
+      categories: paginate_categories.map{|value| value.construct},
       count: paginate_categories.count,
       total: categories.count
 		}
+  end
+
+  def construct
+    return {
+      id: id,
+      name: name
+    }
   end
 
 protected

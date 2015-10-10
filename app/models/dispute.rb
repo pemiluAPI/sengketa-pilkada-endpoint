@@ -5,34 +5,31 @@ class Dispute < ActiveRecord::Base
   validates :region_id,
    					presence: true
 
-  delegate :constituency, to: :region, prefix: false, allow_nil: true
-  delegate :name, to: :category, prefix: true, allow_nil: true
-
-  scope :by_id, lambda{ |id| where("disputes.id = ?", id) unless id.nil? }
-  scope :by_region, lambda{ |region_id| where("disputes.region_id = ?", region_id) unless region_id.nil? }
-  scope :by_category, lambda{ |category_id| where("disputes.category_id = ?", category_id) unless category_id.nil? }
+  scope :by_id, lambda{ |id| where("id = ?", id) unless id.nil? }
+  scope :by_region_id, lambda{ |region_id| where("region_id = ?", region_id) unless region_id.nil? }
+  scope :by_category_id, lambda{ |category_id| where("category_id = ?", category_id) unless category_id.nil? }
 
   def self.apiall(data = {})
-    disputes          = self.by_id(data[:id]).by_region(data[:region_id]).by_category(data[:category_id])
+    disputes          = self.by_id(data[:id]).by_region_id(data[:region_id]).by_category_id(data[:category_id])
     paginate_disputes = disputes.limit(setlimit(data[:limit])).offset(data[:offset])
 
     return {
-      disputes: paginate_disputes.map{|dispute|
-                  {
-                  	id: dispute.id,
-                  	region_id: dispute.region_id,
-                  	constituency: dispute.constituency,
-                  	category_id: dispute.category_id,
-                  	category_name: dispute.category_name,
-                  	applicant: dispute.applicant,
-                  	respondent: dispute.respondent,
-                  	disputed: dispute.disputed,
-                  	decision_verdict: dispute.decision_verdict
-                  }
-              	},
+      disputes: paginate_disputes.map{|value| value.construct},
       count: paginate_disputes.count,
       total: disputes.count
 		}
+  end
+
+  def construct
+    return {
+      id: id,
+      region: (region.construct if region),
+      category: (category.construct if category),
+      applicant: applicant,
+      respondent: respondent,
+      disputed: disputed,
+      decision_verdict: decision_verdict
+    }
   end
 
 protected

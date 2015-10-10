@@ -4,20 +4,24 @@ class Region < ActiveRecord::Base
   validates :constituency,
    					presence: true
 
+  scope :by_id, lambda{ |id| where("id = ?", id) unless id.nil? }
+
   def self.apiall(data = {})
-    regions          = self.all
+    regions          = self.by_id(data[:id])
     paginate_regions = regions.limit(setlimit(data[:limit])).offset(data[:offset])
 
     return {
-      regions: 	paginate_regions.map{|region|
-                  {
-                  	id: region.id,
-                  	constituency: region.constituency
-                  }
-              	},
+      regions: paginate_regions.map{|value| value.construct},
       count: paginate_regions.count,
       total: regions.count
 		}
+  end
+
+  def construct
+    return {
+      id: id,
+      constituency: constituency
+    }
   end
 
 protected
