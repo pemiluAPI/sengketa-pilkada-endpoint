@@ -28,7 +28,10 @@ class Dispute < ActiveRecord::Base
       applicant: applicant,
       respondent: respondent,
       disputed: disputed,
-      decision_verdict: decision_verdict
+      decision_verdict: decision_verdict,
+      upload_files: upload_files,
+      date: (date.strftime("%Y-%d-%m %H:%M:%S") rescue ""),
+      supporting_political_parties: supporting_political_parties
     }
   end
 

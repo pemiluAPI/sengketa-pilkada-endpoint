@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150922100902) do
+ActiveRecord::Schema.define(version: 20151030083641) do
 
   create_table "categories", force: true do |t|
     t.string   "name"
@@ -26,6 +26,9 @@ ActiveRecord::Schema.define(version: 20150922100902) do
     t.string   "respondent"
     t.text     "disputed"
     t.string   "decision_verdict"
+    t.string   "upload_files"
+    t.datetime "date"
+    t.string   "supporting_political_parties"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
